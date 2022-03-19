@@ -3,7 +3,7 @@ use std::sync::Arc;
 use clap::Parser;
 use futures::StreamExt;
 use tokio::sync::Mutex;
-use octopus_near_indexer_kafka::data::cli::indexer::{Opts, RunSubCommand, Stats, INDEXER};
+use octopus_near_indexer_kafka::models::cli::indexer::{Opts, RunSubCommand, Stats, INDEXER};
 use octopus_near_indexer_kafka::log::{init_tracing, indexer_logger};
 
 fn main() {

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use crate::data::cli::indexer::{INDEXER, Stats};
+use crate::models::cli::indexer::{INDEXER, Stats};
 use crate::utils::fetch_latest_block;
 
 

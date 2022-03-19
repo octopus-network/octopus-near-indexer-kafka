@@ -1,5 +1,5 @@
 use clap::Parser;
-use octopus_near_indexer_kafka::data::cli::generate::{GenerateSubCommand, Opts};
+use octopus_near_indexer_kafka::models::cli::generate::{GenerateSubCommand, Opts};
 use octopus_near_indexer_kafka::log::init_tracing;
 
 
