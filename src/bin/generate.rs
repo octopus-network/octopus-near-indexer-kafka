@@ -1,5 +1,5 @@
 use clap::Parser;
-use tracing_subscriber::EnvFilter;
+use octopus_near_indexer_kafka::tracing::init_tracing;
 
 /// Octopus Near Indexer Kafka
 /// Watches for stream of blocks from the chain and puts it in Kafka
@@ -17,11 +17,11 @@ pub struct Opts {
     #[clap(short, long)]
     pub home: Option<std::path::PathBuf>,
     #[clap(subcommand)]
-    pub sub_cmd: SubCommand,
+    pub sub_cmd: GenerateSubCommand,
 }
 
 #[derive(Parser, Clone, Debug)]
-pub enum SubCommand {
+pub enum GenerateSubCommand {
     /// Initialize necessary configs
     Init(InitConfigArgs),
 }
@@ -79,7 +79,7 @@ fn main() {
     let home_dir = opts.home.unwrap_or_else(near_indexer::get_default_home);
 
     match opts.sub_cmd {
-        SubCommand::Init(config) => near_indexer::init_configs(
+        GenerateSubCommand::Init(config) => near_indexer::init_configs(
             &home_dir,
             config.chain_id.as_ref().map(AsRef::as_ref),
             config.account_id.map(|account_id_string| {
@@ -99,29 +99,4 @@ fn main() {
         )
             .expect("Failed to initialize the node config files"),
     }
-}
-
-fn init_tracing() {
-    let mut env_filter = EnvFilter::new(
-        "tokio_reactor=info,near=info,stats=info,telemetry=info,indexer=info,near_lake=info,aggregated=info",
-    );
-
-    if let Ok(rust_log) = std::env::var("RUST_LOG") {
-        if !rust_log.is_empty() {
-            for directive in rust_log.split(',').filter_map(|s| match s.parse() {
-                Ok(directive) => Some(directive),
-                Err(err) => {
-                    eprintln!("Ignoring directive `{}`: {}", s, err);
-                    None
-                }
-            }) {
-                env_filter = env_filter.add_directive(directive);
-            }
-        }
-    }
-
-    tracing_subscriber::fmt::Subscriber::builder()
-        .with_env_filter(env_filter)
-        .with_writer(std::io::stderr)
-        .init();
 }
