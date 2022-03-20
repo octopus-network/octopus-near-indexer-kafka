@@ -83,14 +83,14 @@ async fn handle_message(
     let block_json = serde_json::to_value(streamer_message.block)
         .expect("Failed to serializer BlockView to JSON");
 
-    produce("near-block", &block_json.to_string()).await;
+    produce("blockchain-near-block", &block_json.to_string()).await;
 
     // Shards
     for shard in streamer_message.shards.iter() {
         let shard_json =
             serde_json::to_value(shard).expect("Failed to serialize IndexerShard to JSON");
 
-        produce("near-shard", &shard_json.to_string()).await;
+        produce("blockchain-near-chunks", &shard_json.to_string()).await;
     }
     let mut stats_lock = stats.lock().await;
     stats_lock.block_heights_processing.remove(&block_height);
