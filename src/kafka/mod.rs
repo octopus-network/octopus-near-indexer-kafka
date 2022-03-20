@@ -1,5 +1,6 @@
 use anyhow::{Error, Result};
 use rdkafka::config::ClientConfig;
+use rdkafka::producer::FutureProducer;
 use std::env;
 
 pub mod produce;
@@ -21,4 +22,10 @@ pub fn kafka_config() -> Result<ClientConfig> {
         );
     }
     Ok(kafka_config)
+}
+
+pub fn try_producer() -> Result<FutureProducer> {
+    let config = kafka_config()?;
+    let producer = config.create()?;
+    Ok(producer)
 }

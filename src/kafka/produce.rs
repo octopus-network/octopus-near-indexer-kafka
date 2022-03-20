@@ -1,15 +1,11 @@
-use crate::kafka::kafka_config;
+use crate::kafka::try_producer;
 use crate::models::cli::INDEXER;
-use rdkafka::producer::{FutureProducer, FutureRecord};
+use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 
 pub async fn produce(topic_name: &str, json: &str) {
-    let producer: &FutureProducer = &kafka_config()
-        .expect("Kafka config check fail")
-        .create()
-        .expect("Kafka config build fail");
-
-    let delivery_status = producer
+    let delivery_status = try_producer()
+        .expect("Fail get producer")
         .send(
             FutureRecord::to(topic_name)
                 .payload(&json.to_string())

@@ -127,6 +127,7 @@ pub struct Stats {
     pub blocks_processed_count: u64,
     pub last_processed_block_height: u64,
 }
+
 impl Default for Stats {
     fn default() -> Self {
         Self::new()
