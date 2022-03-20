@@ -57,7 +57,11 @@ async fn listen_blocks(
 ) {
     let mut handle_messages = tokio_stream::wrappers::ReceiverStream::new(stream)
         .map(|streamer_message| {
-            tracing::info!("Block height {}", &streamer_message.block.header.height);
+            tracing::info!(
+                target: INDEXER,
+                "Block height {}",
+                &streamer_message.block.header.height
+            );
 
             handle_message(streamer_message, Arc::clone(&stats))
         })
@@ -80,14 +84,15 @@ async fn handle_message(
     // Block
     let block_json = serde_json::to_value(streamer_message.block)
         .expect("Failed to serializer BlockView to JSON");
+
     produce("near-block", &block_json.to_string()).await;
+
     // Shards
     for shard in streamer_message.shards.iter() {
-        let _key = format!("{}/shard_{}.json", base_key, shard.shard_id);
         let shard_json =
             serde_json::to_value(shard).expect("Failed to serialize IndexerShard to JSON");
+
         produce("near-shard", &shard_json.to_string()).await;
-        println!("{}", shard_json);
     }
     let mut stats_lock = stats.lock().await;
     stats_lock.block_heights_processing.remove(&block_height);
