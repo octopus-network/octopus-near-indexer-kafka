@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
 use rdkafka::config::ClientConfig;
 use std::env;
 
@@ -12,7 +12,11 @@ pub fn kafka_config() -> Result<ClientConfig> {
         }
         let config_key: Vec<&str> = key.split("kafka.").collect();
         kafka_config.set(
-            config_key.get(1).ok_or("fail load value")?.to_owned(),
+            config_key
+                .get(1)
+                .ok_or("fail load value")
+                .map_err(Error::msg)?
+                .to_owned(),
             value,
         );
     }

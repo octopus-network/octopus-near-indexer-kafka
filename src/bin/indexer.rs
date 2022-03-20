@@ -79,8 +79,6 @@ async fn handle_message(
     stats_lock.block_heights_processing.insert(block_height);
     drop(stats_lock);
 
-    let base_key = format!("{:0>12}", streamer_message.block.header.height);
-
     // Block
     let block_json = serde_json::to_value(streamer_message.block)
         .expect("Failed to serializer BlockView to JSON");

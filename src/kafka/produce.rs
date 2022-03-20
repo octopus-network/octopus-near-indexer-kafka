@@ -18,5 +18,9 @@ pub async fn produce(topic_name: &str, json: &String) {
         )
         .await;
 
-    tracing::info!(target: INDEXER, ,"Future completed. Result: {:?}", delivery_status);
+    tracing::info!(
+        target: INDEXER,
+        "Future completed. Result: {:?}",
+        delivery_status
+    );
 }
