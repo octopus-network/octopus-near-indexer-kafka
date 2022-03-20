@@ -4,7 +4,7 @@
 
 此为本服务第一个版本
 
-默认创建两个 kafka topic 以测试网高度 80989087 为例包含 1 个 block，4 个 chunk。
+默认创建两个 Kafka Topics， 以 `testnet` 高度 `80989087` 为例包含 1 个 block，4 个 chunk。
 
 
 
