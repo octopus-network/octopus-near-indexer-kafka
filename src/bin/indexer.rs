@@ -3,10 +3,12 @@ use std::sync::Arc;
 use clap::Parser;
 use futures::StreamExt;
 use tokio::sync::Mutex;
+use octopus_near_indexer_kafka::kafka::produce::produce;
 use octopus_near_indexer_kafka::models::cli::indexer::{Opts, RunSubCommand, Stats, INDEXER};
 use octopus_near_indexer_kafka::log::{init_tracing, indexer_logger};
 
 fn main() {
+    // let _kafka_config = get_config().expect("Failed to get kafka config");
     // We use it to automatically search the for root certificates to perform HTTPS calls
     // (sending telemetry and downloading genesis)
     openssl_probe::init_ssl_cert_env_vars();
@@ -87,15 +89,13 @@ async fn handle_message(
     // Block
     let block_json = serde_json::to_value(streamer_message.block)
         .expect("Failed to serializer BlockView to JSON");
-    // TODO: Push Block to Kafka
-    println!("{}", block_json);
-
+    produce("near-block", &block_json.to_string()).await;
     // Shards
     for shard in streamer_message.shards.iter() {
         let _key = format!("{}/shard_{}.json", base_key, shard.shard_id);
         let shard_json =
             serde_json::to_value(shard).expect("Failed to serialize IndexerShard to JSON");
-        // TODO: Push Block to Kafka
+        produce("near-shard", &shard_json.to_string()).await;
         println!("{}", shard_json);
     }
     let mut stats_lock = stats.lock().await;
