@@ -7,7 +7,7 @@ pub mod produce;
 pub fn kafka_config() -> Result<ClientConfig> {
     let mut kafka_config = ClientConfig::new();
     for (key, value) in env::vars() {
-        if !key.starts_with("kafka.") || key.len() < 1 {
+        if !key.starts_with("kafka.") || key.is_empty() {
             continue;
         }
         let config_key: Vec<&str> = key.split("kafka.").collect();

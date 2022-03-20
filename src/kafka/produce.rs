@@ -3,7 +3,7 @@ use crate::models::cli::INDEXER;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
 
-pub async fn produce(topic_name: &str, json: &String) {
+pub async fn produce(topic_name: &str, json: &str) {
     let producer: &FutureProducer = &kafka_config()
         .expect("Kafka config check fail")
         .create()
@@ -12,8 +12,8 @@ pub async fn produce(topic_name: &str, json: &String) {
     let delivery_status = producer
         .send(
             FutureRecord::to(topic_name)
-                .payload(&format!("{}", json))
-                .key(&format!("{}", "1")),
+                .payload(&json.to_string())
+                .key(&json.to_string()),
             Timeout::Never,
         )
         .await;
