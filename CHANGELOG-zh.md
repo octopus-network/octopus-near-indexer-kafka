@@ -348,7 +348,9 @@
     }
   ]
 }
+```
 
+```
 {
   "chunk": {
     "author": "node1",
@@ -379,7 +381,9 @@
   "shard_id": 1,
   "state_changes": []
 }
+```
 
+```
 {
   "chunk": {
     "author": "node1",
@@ -410,7 +414,9 @@
   "shard_id": 2,
   "state_changes": []
 }
+```
 
+```
 {
   "chunk": {
     "author": "node1",
@@ -533,8 +539,6 @@
     }
   ]
 }
-
-
 ```
 
 
