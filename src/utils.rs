@@ -1,6 +1,5 @@
 use near_indexer_primitives::types;
 
-
 /// Fetches the status to retrieve `latest_block_height` to determine if we need to fetch
 /// entire block or we already fetched this block.
 pub async fn fetch_latest_block(

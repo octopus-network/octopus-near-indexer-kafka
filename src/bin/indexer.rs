@@ -1,20 +1,21 @@
-use std::sync::Arc;
-
 use clap::Parser;
+use dotenv::dotenv;
 use futures::StreamExt;
-use tokio::sync::Mutex;
 use octopus_near_indexer_kafka::kafka::produce::produce;
-use octopus_near_indexer_kafka::models::cli::indexer::{Opts, RunSubCommand, Stats, INDEXER};
-use octopus_near_indexer_kafka::log::{init_tracing, indexer_logger};
+use octopus_near_indexer_kafka::log::{indexer_logger, init_tracing};
+use octopus_near_indexer_kafka::models::cli::{IndexerOpts, RunSubCommand, Stats, INDEXER};
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 fn main() {
-    // let _kafka_config = get_config().expect("Failed to get kafka config");
+    dotenv().ok();
     // We use it to automatically search the for root certificates to perform HTTPS calls
     // (sending telemetry and downloading genesis)
     openssl_probe::init_ssl_cert_env_vars();
+
     init_tracing();
 
-    let opts: Opts = Opts::parse();
+    let opts: IndexerOpts = IndexerOpts::parse();
 
     let home_dir = opts.home.unwrap_or_else(near_indexer::get_default_home);
 
@@ -40,11 +41,7 @@ fn main() {
 
                 actix::spawn(indexer_logger(Arc::clone(&stats), view_client));
 
-                listen_blocks(
-                    stream,
-                    args.concurrency,
-                    Arc::clone(&stats),
-                ).await;
+                listen_blocks(stream, args.concurrency, Arc::clone(&stats)).await;
 
                 actix::System::current().stop();
             });
@@ -53,7 +50,6 @@ fn main() {
     }
 }
 
-
 async fn listen_blocks(
     stream: tokio::sync::mpsc::Receiver<near_indexer_primitives::StreamerMessage>,
     concurrency: std::num::NonZeroU16,
@@ -61,14 +57,9 @@ async fn listen_blocks(
 ) {
     let mut handle_messages = tokio_stream::wrappers::ReceiverStream::new(stream)
         .map(|streamer_message| {
-            tracing::info!(
-                "Block height {}", &streamer_message.block.header.height
-            );
+            tracing::info!("Block height {}", &streamer_message.block.header.height);
 
-            handle_message(
-                streamer_message,
-                Arc::clone(&stats),
-            )
+            handle_message(streamer_message, Arc::clone(&stats))
         })
         .buffer_unordered(usize::from(concurrency.get()));
 

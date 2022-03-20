@@ -1,12 +1,9 @@
-use std::time::Duration;
+use crate::kafka::get_config;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
-use crate::kafka::config::get_config;
 
 pub async fn produce(topic_name: &str, json: &String) {
-    let producer: &FutureProducer = &get_config().expect("")
-        .create()
-        .expect("");
+    let producer: &FutureProducer = &get_config().expect("").create().expect("");
 
     let delivery_status = producer
         .send(
