@@ -3,6 +3,9 @@ use dotenv::dotenv;
 use futures::StreamExt;
 use octopus_near_indexer_kafka::kafka::produce::produce;
 use octopus_near_indexer_kafka::log::{indexer_logger, init_tracing};
+use octopus_near_indexer_kafka::models::analysis::blocks::Block;
+use octopus_near_indexer_kafka::models::analysis::chunks::Chunk;
+use octopus_near_indexer_kafka::models::analysis::Analysis;
 use octopus_near_indexer_kafka::models::cli::{IndexerOpts, RunSubCommand, Stats, INDEXER};
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -80,7 +83,7 @@ async fn handle_message(
     drop(stats_lock);
 
     // Block
-    let block_json = serde_json::to_value(streamer_message.block)
+    let block_json = serde_json::to_value(&streamer_message.block)
         .expect("Failed to serializer BlockView to JSON");
 
     produce("blockchain-near-block", &block_json.to_string()).await;
@@ -92,6 +95,16 @@ async fn handle_message(
 
         produce("blockchain-near-chunks", &shard_json.to_string()).await;
     }
+
+    // Analysis
+    let _analysis = Analysis {
+        analysis_blocks: Block::from(&streamer_message.block),
+        analysis_chunks: Chunk::from(
+            &streamer_message.shards,
+            &streamer_message.block.header.hash,
+        ),
+    };
+
     let mut stats_lock = stats.lock().await;
     stats_lock.block_heights_processing.remove(&block_height);
     stats_lock.blocks_processed_count += 1;

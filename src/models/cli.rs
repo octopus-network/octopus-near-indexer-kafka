@@ -61,7 +61,7 @@ pub struct InitConfigArgs {
     /// from genesis configuration will be taken.
     #[clap(long)]
     pub max_gas_burnt_view: Option<u64>,
-    /// Initialize boots nodes in <node_key>@<ip_addr> format seperated by commas
+    /// Initialize boots nodes in <node_key>@<ip_addr> analysis seperated by commas
     /// to bootstrap the network and store them in config.json
     #[clap(long)]
     pub boot_nodes: Option<String>,
