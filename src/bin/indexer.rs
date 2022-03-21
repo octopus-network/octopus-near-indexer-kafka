@@ -79,19 +79,11 @@ async fn handle_message(
     stats_lock.block_heights_processing.insert(block_height);
     drop(stats_lock);
 
-    // Block
-    let block_json = serde_json::to_value(streamer_message.block)
-        .expect("Failed to serializer BlockView to JSON");
+    let json =
+        serde_json::to_value(streamer_message).expect("Failed to serializer BlockView to JSON");
 
-    produce("blockchain-near-block", &block_json.to_string()).await;
+    produce("blockchain-near-analysis", &json.to_string()).await;
 
-    // Shards
-    for shard in streamer_message.shards.iter() {
-        let shard_json =
-            serde_json::to_value(shard).expect("Failed to serialize IndexerShard to JSON");
-
-        produce("blockchain-near-chunks", &shard_json.to_string()).await;
-    }
     let mut stats_lock = stats.lock().await;
     stats_lock.block_heights_processing.remove(&block_height);
     stats_lock.blocks_processed_count += 1;
