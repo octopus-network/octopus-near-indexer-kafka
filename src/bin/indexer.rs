@@ -1,11 +1,9 @@
 use clap::Parser;
 use dotenv::dotenv;
 use futures::StreamExt;
-use octopus_near_indexer_kafka::kafka::produce::produce;
-use octopus_near_indexer_kafka::log::{indexer_logger, init_tracing};
-use octopus_near_indexer_kafka::models::cli::{IndexerOpts, RunSubCommand, Stats, INDEXER};
-use std::sync::Arc;
-use tokio::sync::Mutex;
+use octopus_near_indexer_kafka::kafka::produce::send;
+use octopus_near_indexer_kafka::log::init_tracing;
+use octopus_near_indexer_kafka::models::cli::{IndexerOpts, RunSubCommand, INDEXER};
 
 fn main() {
     dotenv().ok();
@@ -35,13 +33,8 @@ fn main() {
 
                 // Regular indexer process starts here
                 let stream = indexer.streamer();
-                let view_client = indexer.client_actors().0;
 
-                let stats: Arc<Mutex<Stats>> = Arc::new(Mutex::new(Stats::new()));
-
-                actix::spawn(indexer_logger(Arc::clone(&stats), view_client));
-
-                listen_blocks(stream, args.concurrency, Arc::clone(&stats)).await;
+                listen_blocks(stream, args.concurrency).await;
 
                 actix::System::current().stop();
             });
@@ -51,9 +44,8 @@ fn main() {
 }
 
 async fn listen_blocks(
-    stream: tokio::sync::mpsc::Receiver<near_indexer_primitives::StreamerMessage>,
+    stream: tokio::sync::mpsc::Receiver<near_indexer::StreamerMessage>,
     concurrency: std::num::NonZeroU16,
-    stats: Arc<Mutex<Stats>>,
 ) {
     let mut handle_messages = tokio_stream::wrappers::ReceiverStream::new(stream)
         .map(|streamer_message| {
@@ -62,8 +54,7 @@ async fn listen_blocks(
                 "Block height {}",
                 &streamer_message.block.header.height
             );
-
-            handle_message(streamer_message, Arc::clone(&stats))
+            handle_message(streamer_message)
         })
         .buffer_unordered(usize::from(concurrency.get()));
 
@@ -71,23 +62,8 @@ async fn listen_blocks(
 }
 
 async fn handle_message(
-    streamer_message: near_indexer_primitives::StreamerMessage,
-    stats: Arc<Mutex<Stats>>,
+    streamer_message: near_indexer::StreamerMessage,
 ) -> anyhow::Result<()> {
-    let block_height = streamer_message.block.header.height;
-    let mut stats_lock = stats.lock().await;
-    stats_lock.block_heights_processing.insert(block_height);
-    drop(stats_lock);
-
-    let json =
-        serde_json::to_value(streamer_message).expect("Failed to serializer BlockView to JSON");
-
-    produce("blockchain-near-analysis", &json.to_string()).await;
-
-    let mut stats_lock = stats.lock().await;
-    stats_lock.block_heights_processing.remove(&block_height);
-    stats_lock.blocks_processed_count += 1;
-    stats_lock.last_processed_block_height = block_height;
-    drop(stats_lock);
+    send("blockchain-near-analysis", &streamer_message).await;
     Ok(())
 }

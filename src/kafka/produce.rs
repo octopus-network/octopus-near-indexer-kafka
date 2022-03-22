@@ -3,7 +3,10 @@ use crate::models::cli::INDEXER;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 
-pub async fn produce(topic_name: &str, json: &str) {
+pub async fn send(topic_name: &str, streamer_message: &near_indexer::StreamerMessage) {
+    let json =
+        serde_json::to_value(&streamer_message).expect("Failed to serializer message to JSON");
+
     let delivery_status = try_producer()
         .expect("Fail get producer")
         .send(
@@ -14,9 +17,12 @@ pub async fn produce(topic_name: &str, json: &str) {
         )
         .await;
 
+    // TODO: Send fail retry
+
     tracing::info!(
         target: INDEXER,
-        "Future completed. Result: {:?}",
-        delivery_status
+        "Future completed. Result: {:?}. Block: {:?}",
+        delivery_status,
+        format!("{:0>12}", streamer_message.block.header.height)
     );
 }
