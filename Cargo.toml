@@ -14,7 +14,7 @@ humantime = "2.1.0"
 itertools = "^0.10.3"
 openssl-probe = { version = "0.1.2" }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1.0.55"
+serde_json = "1"
 tokio = { version = "1.1", features = ["sync", "time"] }
 tokio-stream = { version = "0.1" }
 tracing = "0.1.13"
@@ -23,6 +23,5 @@ rdkafka = { version = "0.28" }
 dotenv = "0.15.0"
 bigdecimal = { version = "=0.1.0", features = ["serde"] }
 
-near-indexer = { git = "https://github.com/near/nearcore", rev = "5f09a3bf042b32d1ff26554433ad6449199ea02a" }
-near-indexer-primitives = { git = "https://github.com/near/nearcore", rev = "5f09a3bf042b32d1ff26554433ad6449199ea02a" }
-near-client = { git = "https://github.com/near/nearcore", rev = "5f09a3bf042b32d1ff26554433ad6449199ea02a" }
+near-indexer = { git = "https://github.com/near/nearcore", rev = "9b3d6ba551f561a028f0216051e031bc2ba0c6b7" }
+# near-client = { git = "https://github.com/near/nearcore", rev = "9b3d6ba551f561a028f0216051e031bc2ba0c6b7" }
