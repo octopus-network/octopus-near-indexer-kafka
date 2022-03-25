@@ -12,7 +12,7 @@ pub async fn send(topic_name: &str, streamer_message: &near_indexer::StreamerMes
         .send(
             FutureRecord::to(topic_name)
                 .payload(&json.to_string())
-                .key(&json.to_string()),
+                .key(&streamer_message.block.header.height),
             Timeout::Never,
         )
         .await;
