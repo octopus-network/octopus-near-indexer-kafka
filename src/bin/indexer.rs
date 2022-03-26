@@ -61,9 +61,7 @@ async fn listen_blocks(
     while let Some(_handle_message) = handle_messages.next().await {}
 }
 
-async fn handle_message(
-    streamer_message: near_indexer::StreamerMessage,
-) -> anyhow::Result<()> {
+async fn handle_message(streamer_message: near_indexer::StreamerMessage) -> anyhow::Result<()> {
     send("blockchain-near-analysis", &streamer_message).await;
     Ok(())
 }

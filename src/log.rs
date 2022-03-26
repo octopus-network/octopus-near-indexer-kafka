@@ -2,7 +2,7 @@ use tracing_subscriber::EnvFilter;
 
 pub fn init_tracing() {
     let env_filter = EnvFilter::new(
-        "indexer=info,octopus_near_indexer=trace,chain=info,network=error,stats=info,near_network=error",
+        "indexer=info,octopus_near_indexer=info,chain=info,network=error,stats=info,near_network=error",
     );
 
     tracing_subscriber::fmt::Subscriber::builder()

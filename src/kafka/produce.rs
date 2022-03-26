@@ -25,4 +25,6 @@ pub async fn send(topic_name: &str, streamer_message: &near_indexer::StreamerMes
         delivery_status,
         format!("{:0>12}", streamer_message.block.header.height)
     );
+
+    tracing::debug!(target: INDEXER, "JSON Data: {:?}", &json.to_string());
 }
