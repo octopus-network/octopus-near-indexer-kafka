@@ -19,7 +19,7 @@ tokio = { version = "1.1", features = ["sync", "time"] }
 tokio-stream = { version = "0.1" }
 tracing = "0.1.13"
 tracing-subscriber = "0.2.4"
-rdkafka = { version = "0.28" }
+rdkafka = { version = "0.25.0", features = ["dynamic-linking"] }
 dotenv = "0.15.0"
 
 near-indexer = { git = "https://github.com/near/nearcore", rev = "9b3d6ba551f561a028f0216051e031bc2ba0c6b7" }
