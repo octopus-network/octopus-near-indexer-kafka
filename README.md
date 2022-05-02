@@ -2,6 +2,13 @@
 
 Octopus NEAR Indexer Kafka is built on top of [NEAR Indexer microframework](https://github.com/nearprotocol/nearcore/tree/master/chain/indexer) to watch the network and store all the events in the Kafka.
 
+
+## Roadmap
+
+#### NEAR Lake
+
+- [ ] migrate to NEAR Lake S3 (As a plug -in form [octopus-near-indexer-s3](https://github.com/octopus-network/octopus-near-indexer-s3))
+
 ### Prepare
 
 Clone this repository and open the project folder
